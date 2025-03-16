@@ -1,0 +1,3 @@
+mod13 counter with load, up/down
+uvm testbench has 2 agents - input, output agent for demonstraation
+contain scoreboard, coverage and configuration
