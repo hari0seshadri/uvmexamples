@@ -12,11 +12,12 @@ import uvm_pkg::*;
 
 `include "counter_input_monitor.sv"
 
+
+`include "counter_output_monitor.sv"
+
 `include "counter_input_sequencer.sv"
 
 `include "counter_input_agent.sv"
-
-`include "counter_output_monitor.sv"
 
 `include "counter_output_agent.sv"
 

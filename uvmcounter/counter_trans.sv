@@ -38,7 +38,7 @@ printer.print_field ("load", this.load, '1, UVM_DEC);
 printer.print_field (" data_in", this.data_in, 4, UVM_DEC);
 printer.print_field ("data_out", this.data_out, 4, UVM_DEC); 
 endfunction: do_print
- 
+  
   function void post_randomize();
 no_of_xtn++;
     `uvm_info("randomized data", $sformatf("randomized transaction [%d] is %s\n", no_of_xtn, this.sprint()),UVM_MEDIUM)

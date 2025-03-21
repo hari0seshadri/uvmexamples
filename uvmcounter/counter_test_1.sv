@@ -11,6 +11,8 @@ endfunction
 
 function void build_phase (uvm_phase phase);
 super.build_phase (phase);
+  m_cfg.has_input_monitor=0;
+  m_cfg.has_output_agent =0;
 endfunction
 
 

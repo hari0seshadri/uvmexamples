@@ -31,9 +31,21 @@ endfunction
 function void connect_phase (uvm_phase phase);
 
 uvm_top.print_topology();
-if(m_cfg.has_input_agent && m_cfg.has_scoreboard)
+  if(m_cfg.has_input_agent && m_cfg.has_scoreboard&&m_cfg.has_input_monitor)
 input_agent_h.monh.monitor_port.connect (scoreboard_h.input_mon_fifo.analysis_export);
+  
+  if(m_cfg.has_input_agent && m_cfg.has_scoreboard&& !m_cfg.has_input_monitor)
+input_agent_h.drvh.driver_port.connect (scoreboard_h.input_mon_fifo.analysis_export);
+  
 if (m_cfg.has_output_agent && m_cfg.has_scoreboard)
 output_agent_h.monh.monitor_port.connect (scoreboard_h.output_mon_fifo.analysis_export);
+  
+  if (!m_cfg.has_output_agent && m_cfg.has_scoreboard && !m_cfg.has_input_monitor)
+input_agent_h.outmonh.monitor_port.connect (scoreboard_h.output_mon_fifo.analysis_export);
 endfunction
+
+
+
+
+
 endclass
