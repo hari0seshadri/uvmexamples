@@ -1,4 +1,3 @@
-MGLS_HOME=C:\questasim64_2024.1
 UVM_HOME=$(MGLS_HOME)/verilog_src/uvm-1.2
 QUESTA_UVM_HOME= $(MGLS_HOME)/verilog_src/questa_uvm_pkg-1.2
 SRC_RTL = counter.sv
@@ -8,7 +7,7 @@ VERILOG_FILES = counter_pkg.sv \
 	$(SRC_RTL) \
 	counter_tb_top.sv
 UVM_FILES =  +incdir+${UVM_HOME}/src +define+UVM_NO_DEPRECATED +define+QUESTA ${UVM_HOME}/src/uvm.sv
-UVM_DEBUG_FILES = +incdir+${QUESTA_UVM_HOME}/src ${QUESTA_UVM_HOME}/src/questa_uvm_pkg.sv ${UVM_HOME}/src/dpi/uvm_dpi.cc -ccflags "-DQUESTA -I c:\mingw64\include"
+UVM_DEBUG_FILES = +incdir+${QUESTA_UVM_HOME}/src ${QUESTA_UVM_HOME}/src/questa_uvm_pkg.sv ${UVM_HOME}/src/dpi/uvm_dpi.cc -ccflags "-DQUESTA"
 UVM_DEBUG_OPTION = -classdebug -msgmode both -uvmcontrol=all
 TOPLEVEL = counter_tb_top
 
@@ -24,10 +23,10 @@ help:
 questa_gui: 
 	vlib work
 	vmap work work
-	vlog -64 +acc ${VERILOG_FILES} ${UVM_FILES} ${UVM_DEBUG_FILES} +incdir+C:\mingw64\include
+	vlog -64 +acc ${VERILOG_FILES} ${UVM_FILES} ${UVM_DEBUG_FILES} 
 	vsim -64 ${UVM_DEBUG_OPTION} -L $(MGLS_HOME)/uvm-1.2 -do run.do ${TOPLEVEL}
 
-questa_batch:  ${VERILOG_FILES} 
+questa_batch:  ${VERILOG_FILES} clean
 	vlib work
 	vmap work work
 	vlog -64 +acc ${UVM_FILES} ${VERILOG_FILES}
