@@ -1,10 +1,15 @@
 UVM_HOME=$(MGLS_HOME)/verilog_src/uvm-1.2
 QUESTA_UVM_HOME= $(MGLS_HOME)/verilog_src/questa_uvm_pkg-1.2
-VERILOG_FILES = dut.sv my_testbench_pkg.sv testbench.sv
+SRC_RTL = counter.sv
+
+VERILOG_FILES = counter_pkg.sv \
+	counter_if.sv \
+	$(SRC_RTL) \
+	counter_tb_top.sv
 UVM_FILES =  +incdir+${UVM_HOME}/src +define+UVM_NO_DEPRECATED +define+QUESTA ${UVM_HOME}/src/uvm.sv
 UVM_DEBUG_FILES = +incdir+${QUESTA_UVM_HOME}/src ${QUESTA_UVM_HOME}/src/questa_uvm_pkg.sv ${UVM_HOME}/src/dpi/uvm_dpi.cc -ccflags "-DQUESTA"
-UVM_DEBUG_OPTION = -classdebug -msgmode both -uvmcontrol=all 
-TOPLEVEL = top
+UVM_DEBUG_OPTION = -classdebug -msgmode both -uvmcontrol=all
+TOPLEVEL = counter_tb_top
 
 help:
 	@echo "Make targets:"
