@@ -1,15 +1,15 @@
 UVM_HOME=$(MGLS_HOME)/verilog_src/uvm-1.2
 QUESTA_UVM_HOME= $(MGLS_HOME)/verilog_src/questa_uvm_pkg-1.2
-SRC_RTL = counter.sv
+SRC_RTL = dut.sv
+TEST=test1
 
-VERILOG_FILES = counter_pkg.sv \
-	counter_if.sv \
+VERILOG_FILES = my_testbench_pkg.sv \
 	$(SRC_RTL) \
-	counter_tb_top.sv
+	testbench.sv
 UVM_FILES =  +incdir+${UVM_HOME}/src +define+UVM_NO_DEPRECATED +define+QUESTA ${UVM_HOME}/src/uvm.sv
 UVM_DEBUG_FILES = +incdir+${QUESTA_UVM_HOME}/src ${QUESTA_UVM_HOME}/src/questa_uvm_pkg.sv ${UVM_HOME}/src/dpi/uvm_dpi.cc -ccflags "-DQUESTA"
 UVM_DEBUG_OPTION = -classdebug -msgmode both -uvmcontrol=all
-TOPLEVEL = counter_tb_top
+TOPLEVEL = top
 
 help:
 	@echo "Make targets:"
@@ -24,13 +24,13 @@ questa_gui:
 	vlib work
 	vmap work work
 	vlog -64 +acc ${VERILOG_FILES} ${UVM_FILES} ${UVM_DEBUG_FILES} 
-	vsim -64 ${UVM_DEBUG_OPTION} -L $(MGLS_HOME)/uvm-1.2 -do run.do ${TOPLEVEL}
+	vsim -64 ${UVM_DEBUG_OPTION} -L $(MGLS_HOME)/uvm-1.2 -do run.do ${TOPLEVEL} +UVM_TESTNAME=$(TEST)
 
 questa_batch:  ${VERILOG_FILES} clean
 	vlib work
 	vmap work work
 	vlog -64 +acc ${UVM_FILES} ${VERILOG_FILES}
-	vsim -64 -c -L $(MGLS_HOME)/uvm-1.2 -do run.do ${TOPLEVEL}
+	vsim -64 -c -L $(MGLS_HOME)/uvm-1.2 -do run.do ${TOPLEVEL} +UVM_TESTNAME=$(TEST)
 
 #############################################################################
 # Housekeeping
