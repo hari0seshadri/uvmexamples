@@ -29,7 +29,7 @@
 // TLM CONNECTIONS (connect_phase):
 //   driver.ap    → sb.stim_imp      analysis path: driver→scoreboard stim
 //   monitor.ap   → sb.resp_imp      analysis path: monitor→scoreboard resp
-//   driver.ap    → cov.analysis_imp analysis path: driver→coverage (if enabled)
+//   driver.ap    → cov.analysis_export analysis path: driver→coverage (if enabled)
 //   vseqr.counter_seqr = agent.sequencer   virtual seqr→real seqr assignment
 //
 // Why driver.ap → coverage (not monitor.ap)?
@@ -101,7 +101,7 @@ class counter_env extends uvm_env;
   // Analysis connections follow the data flow:
   //   driver (produces stimulus) → scoreboard stim_imp
   //   monitor (produces response) → scoreboard resp_imp
-  //   driver (produces stimulus) → coverage analysis_imp (if enabled)
+  //   driver (produces stimulus) → coverage analysis_export (if enabled)
   //
   // The virtual sequencer gets a reference to the real sequencer so that
   // virtual sequences can start sub-sequences on the real driver path.
@@ -126,7 +126,8 @@ class counter_env extends uvm_env;
     // Driver → coverage: stimulus transactions carry test_type, load_value,
     // start_count, and cycle counts for rich coverpoint measurement.
     if (cfg.enable_coverage)
-      agent.driver.ap.connect(cov.analysis_imp);
+      //agent.driver.ap.connect(cov.analysis_imp);
+agent.driver.ap.connect(cov.analysis_export);
 
     // ── Virtual sequencer wiring ───────────────────────────────────────────
     // Assign the real sequencer handle so virtual sequences can start

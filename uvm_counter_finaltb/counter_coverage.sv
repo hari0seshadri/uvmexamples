@@ -18,20 +18,18 @@
 //
 // CONNECTIVITY
 // ------------
-// The coverage collector extends uvm_component and declares its own
-// uvm_analysis_imp to receive stimulus transactions from the driver.
+// The coverage collector extends uvm_subscriber and uses UVM builtin
+// uvm_analysis_export to receive stimulus transactions from the driver.
 // In counter_env::connect_phase:
 //
-//   counter_driver.ap → counter_coverage.analysis_imp
+//   counter_driver.ap → counter_coverage.analysis_export
 //
 // The driver's stimulus transactions carry the full test_type, load_value,
 // start_count, up_cycles, and down_cycles fields needed for rich coverage.
 //
-// NOTE: We extend uvm_component (not uvm_subscriber) and declare the
-// analysis_imp explicitly.  uvm_subscriber is a thin wrapper that requires
+// NOTE: We extend uvm_subscriber (not uvm_component) and uses the
+// analysis_export implicitly.  uvm_subscriber is a thin wrapper that requires
 // the write() argument to be named 't' (matching the base class signature).
-// Extending uvm_component directly avoids that naming constraint and is
-// the pattern used consistently in this testbench's reference design.
 //
 // CONDITIONAL CREATION
 // --------------------
@@ -45,12 +43,9 @@
 // cx_type_val:  cross cp_test_type × cp_value → 6×4 = 24 bins.
 //=============================================================================
 
-// analysis_imp declaration for the single write() port on coverage.
-// This macro is placed OUTSIDE the class at package scope.
-// It generates class uvm_analysis_imp_cov that calls parent.write_cov(t).
-`uvm_analysis_imp_decl(_cov)
 
-class counter_coverage extends uvm_component;
+//class counter_coverage extends uvm_component;
+class counter_coverage extends  uvm_subscriber #(counter_transaction);
   `uvm_component_utils(counter_coverage)
 
   //--------------------------------------------------------------------------
@@ -58,7 +53,7 @@ class counter_coverage extends uvm_component;
   // Connected in counter_env::connect_phase:
   //   agent.driver.ap.connect(cov.analysis_imp)
   //--------------------------------------------------------------------------
-  uvm_analysis_imp_cov #(counter_transaction, counter_coverage) analysis_imp;
+//  uvm_analysis_imp_cov #(counter_transaction, counter_coverage) analysis_imp;
 
   //--------------------------------------------------------------------------
   // Sample variables — updated by write_cov() before calling sample().
@@ -122,10 +117,10 @@ class counter_coverage extends uvm_component;
   //--------------------------------------------------------------------------
   // build_phase — create the analysis imp.
   //--------------------------------------------------------------------------
-  virtual function void build_phase(uvm_phase phase);
-    super.build_phase(phase);
-    analysis_imp = new("analysis_imp", this);
-  endfunction
+  //virtual function void build_phase(uvm_phase phase);
+  //  super.build_phase(phase);
+  //  analysis_imp = new("analysis_imp", this);
+  //endfunction
 
   //--------------------------------------------------------------------------
   // write_cov — called automatically when a transaction is written to
@@ -135,22 +130,24 @@ class counter_coverage extends uvm_component;
   //   1. Copy relevant fields into the sample variables
   //   2. Call counter_cg.sample() to record coverage at this instant
   //--------------------------------------------------------------------------
-  virtual function void write_cov(counter_transaction tr);
+ // virtual function void write_cov(counter_transaction tr);
+virtual function void write(counter_transaction t);
+  
     // Copy test_type for the cp_test_type coverpoint
-    cv_test_type = tr.test_type;
+    cv_test_type = t.test_type;
 
     // Choose the most meaningful value field based on test type
-    case (tr.test_type)
-      TEST_LOAD:                      cv_value = tr.load_value;
+    case (t.test_type)
+      TEST_LOAD:                      cv_value = t.load_value;
       TEST_COUNT_UP, TEST_COUNT_DOWN,
-      TEST_OVERFLOW, TEST_UNDERFLOW:  cv_value = tr.start_count;
+      TEST_OVERFLOW, TEST_UNDERFLOW:  cv_value = t.start_count;
       default:                        cv_value = 0;
     endcase
 
     // Choose the most meaningful cycle count based on test type
-    case (tr.test_type)
-      TEST_COUNT_UP:   cv_cycles = tr.up_cycles;
-      TEST_COUNT_DOWN: cv_cycles = tr.down_cycles;
+    case (t.test_type)
+      TEST_COUNT_UP:   cv_cycles = t.up_cycles;
+      TEST_COUNT_DOWN: cv_cycles = t.down_cycles;
       TEST_OVERFLOW:   cv_cycles = 1;
       TEST_UNDERFLOW:  cv_cycles = 1;
       default:         cv_cycles = 0;
@@ -161,7 +158,7 @@ class counter_coverage extends uvm_component;
 
     `uvm_info("COV",
       $sformatf("Sampled: type=%s val=%0d cycles=%0d  coverage=%.1f%%",
-                tr.test_type.name(), cv_value, cv_cycles,
+                t.test_type.name(), cv_value, cv_cycles,
                 counter_cg.get_coverage()),
       UVM_HIGH)
   endfunction
